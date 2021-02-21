@@ -52,8 +52,14 @@ int main() {
 
 vector<pair<int,int>> CircleTheWordSolver::word_locations(vector<vector<char> > &puzzle, vector<string> &wordlist){
 
-  pair <int,char> word_test(wordlist[0].length(), wordlist[0].back());
-
+  vector<pair <int,char>> word_test;
+  word_test.resize(wordlist.size());
+  for(int i = 0; i < wordlist.size(); i++){
+      word_test[i].first = wordlist[i].length() - 1;
+      word_test[i].second = wordlist[i].back();
+  }
+  string temp_str = "";
+  cout<<endl<<endl<<"WORD TEST VEC: "<<word_test[wordlist.size()-1].first<<word_test[wordlist.size()-1].second<<endl;
  // cout<<endl<<endl<<"TEST: "<<word_test.first<<" "<<word_test.second<<endl<<endl;
 
   size_t puzz_height = puzzle.size();
@@ -62,20 +68,26 @@ vector<pair<int,int>> CircleTheWordSolver::word_locations(vector<vector<char> > 
       size_t puzz_width = puzzle[i].size();
 
       for(int j = 0; j < puzz_width; j++){
-	if(puzzle[i][j] == wordlist[0].front()){//  testing to see if this first letter of a word match
-	  //cout<<endl<<endl<<"MATCH: "<<puzzle[i][j]<<"  "<<wordlist[0].front()<<endl;
-	  if(puzzle[i][(j + (word_test.first)-1)] == word_test.second){
-		//cout<<endl<<" found match! "<<endl;
-		//cout<<endl<<"I: "<<i<<"  J: "<<j<<" space: "<<j+((word_test.first)-1)<<endl;
+	       if(puzzle[i][j] == wordlist[0].front()){//  testing to see if this first letter of a word match
 
-	  }
-	  if(puzzle[i+word_test.first][j] == word_test.second){
-		cout<<endl<<" found match! "<<endl;
-                cout<<endl<<"I: "<<i<<"  J: "<<j<<" space: "<<i+((word_test.first))<<endl;
-	  }
-        }
+	       if(puzzle[i][j + word_test[0].first] == word_test[0].second){
+                      
+	       }
+	       if(i + word_test[0].first < puzz_height){
+           if(puzzle[i+word_test[0].first][j] == word_test[0].second){
+             for(int a = i; a < puzz_height; a++)
+               temp_str+=puzzle[a][j];
+		         if(temp_str == wordlist[0]){
+               cout<<endl<<endl<<"MATCH: "<<temp_str<<" "<<wordlist[0]<<endl;
+             }else{
+               temp_str = "";
+             }
+	         }
+         }
+         }
       }
-  }
+   }
+   cout<<endl<<endl<<temp_str<<endl;
   // cout<<endl<<"height: "<<puzz_height;
   //cout<<endl<<"width: "<<puzz_width<<endl;
 
@@ -83,3 +95,5 @@ vector<pair<int,int>> z(1);
 
 return z;
 }
+		            //cout<<endl<<" found match! "<<endl;
+                //cout<<endl<<"I: "<<i<<"  J: "<<j<<" space: "<<i+word_test.first<<endl;
