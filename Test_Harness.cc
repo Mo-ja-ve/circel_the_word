@@ -5,6 +5,9 @@
 using namespace std;
 
 int main() {
+
+  #pragma parallel
+
   int n, m;
   cin >> n;
   cin >> m;
@@ -51,6 +54,7 @@ int main() {
 }
 
 vector<pair<int,int>> CircleTheWordSolver::word_locations(vector<vector<char> > &puzzle, vector<string> &wordlist){
+  #pragma parallel
 
   vector<pair <int,char>> word_test;
   word_test.resize(wordlist.size());
@@ -62,10 +66,12 @@ vector<pair<int,int>> CircleTheWordSolver::word_locations(vector<vector<char> > 
 
   size_t puzz_height = puzzle.size();
 
+  #pragma omp parallel for
   for(int i = 0; i < puzz_height; i++){
       size_t puzz_width = puzzle[i].size();
-
+      //cout<<endl<<" i "<<i<<endl;
       for(int j = 0; j < puzz_width; j++){
+        //cout<<endl<<" j "<<j<<endl;
         int first_letterindex = 0;
         for(first_letterindex; first_letterindex < wordlist.size(); first_letterindex++)
 	       if(puzzle[i][j] == wordlist[first_letterindex].front()){//  testing to see if this first letter of a word matches
@@ -93,7 +99,7 @@ vector<pair<int,int>> CircleTheWordSolver::word_locations(vector<vector<char> > 
              b++; a--;
            }
            if(temp_str == wordlist[first_letterindex]){
-             cout<<endl<<endl<<"MATCH: "<<temp_str<<" "<<wordlist[first_letterindex]<<endl;
+             cout<<endl<<endl<<"MATCH: "<<temp_str<<endl;
              temp_str = "";
            }else{
              temp_str = "";
@@ -109,7 +115,7 @@ vector<pair<int,int>> CircleTheWordSolver::word_locations(vector<vector<char> > 
              }
 
 		         if(temp_str == wordlist[first_letterindex]){
-               cout<<endl<<endl<<"MATCH: "<<temp_str<<" "<<wordlist[first_letterindex]<<endl;
+               cout<<endl<<endl<<"MATCH: "<<temp_str<<endl;
                temp_str = " ";
              }else{
                temp_str = "";
@@ -126,7 +132,7 @@ vector<pair<int,int>> CircleTheWordSolver::word_locations(vector<vector<char> > 
              }
              //cout<<endl<<endl<<"WORD SECOND "<<temp_str<<endl;
              if(temp_str == wordlist[first_letterindex]){
-               cout<<endl<<endl<<"MATCH: "<<temp_str<<" "<<wordlist[first_letterindex]<<endl;
+               cout<<endl<<endl<<"MATCH: "<<temp_str<<endl;
                temp_str = "";
              }else{
                temp_str = "";
@@ -142,18 +148,70 @@ vector<pair<int,int>> CircleTheWordSolver::word_locations(vector<vector<char> > 
                b++; a--; c--;
              }
              if(temp_str == wordlist[first_letterindex]){
-               cout<<endl<<endl<<"MATCH: "<<temp_str<<" "<<wordlist[first_letterindex]<<endl;
+               cout<<endl<<endl<<"MATCH: "<<temp_str<<endl;
                temp_str ="";
              }else{
                temp_str = "";
              }
            }
 
+           if(i - word_test[first_letterindex].first >= 0 && j + word_test[first_letterindex].first <= puzz_width)//  checking to see if word is spelled rightwise and vertically
+             if(puzzle[i - word_test[first_letterindex].first][j + word_test[first_letterindex].first] == word_test[first_letterindex].second){
+               int b = 0; int a = i; int c = j;
+               while(b <= word_test[first_letterindex].first){
+                 temp_str += puzzle[a][c];
+                 b++; a--; c++;
+               }
+                 if(temp_str == wordlist[first_letterindex]){
+                 cout<<endl<<endl<<"MATCH: "<<temp_str<<" "<<endl;
+                 temp_str ="";
+               }else{
+                 temp_str = "";
+               }
+             }
 
+             if((i + word_test[first_letterindex].first < puzz_height) && (j + word_test[first_letterindex].first < puzz_width)){ //  checking to see if word is spelled rightwise and vertically-down
+               //cout<<endl<<endl<<"debug hello!"<<endl;
+               //cout<<endl<<endl<<(i + word_test[first_letterindex].first)<<endl<<(j + word_test[first_letterindex].first)<<endl;
+               //cout<<endl<<puzz_height<<" "<<puzz_width<<endl;
+               if(puzzle[i + word_test[first_letterindex].first][j + word_test[first_letterindex].first] == word_test[first_letterindex].second){
+                    int b = 0; int a = i; int c = j;
+                    while(b <= word_test[first_letterindex].first){
+                   temp_str += puzzle[a][c];
+                   b++; a++; c++;
+                 }
+
+                  if(temp_str == wordlist[first_letterindex]){
+                   cout<<endl<<endl<<"MATCH: "<<temp_str<<endl;
+                   temp_str ="";
+                 }else{
+                   temp_str = "";
+                 }
+               }
+             }
+
+             if((i + word_test[first_letterindex].first < puzz_height) && (j - word_test[first_letterindex].first >= 0)){ //  checking to see if word is spelled lefttwise and vertically-down
+
+               if(puzzle[i + word_test[first_letterindex].first][j - word_test[first_letterindex].first] == word_test[first_letterindex].second){
+                    int b = 0; int a = i; int c = j;
+                    while(b <= word_test[first_letterindex].first){
+                   temp_str += puzzle[a][c];
+                   b++; a++; c--;
+                 }
+
+                  if(temp_str == wordlist[first_letterindex]){
+                   cout<<endl<<endl<<"MATCH: "<<temp_str<<endl;
+                   temp_str ="";
+                 }else{
+                   temp_str = "";
+                 }
+               }
+             }
          }
       }
    }
-   cout<<endl<<endl<<temp_str<<endl;
+   //cout<<endl<<endl<<" debug hello 1"<<endl;
+   //cout<<endl<<endl<<temp_str<<endl;
   // cout<<endl<<"height: "<<puzz_height;
   //cout<<endl<<"width: "<<puzz_width<<endl;
 
